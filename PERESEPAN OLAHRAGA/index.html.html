@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Peresepan Olahraga</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f7fafc;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --primary:#0f766e; /* teal-ish */
+      --accent:#06b6d4;
+      --danger:#ef4444;
+      --shadow: 0 6px 18px rgba(15,23,42,0.06);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color-scheme: light;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#f0f9ff 0%, var(--bg) 100%);
+      padding:28px;
+      color:#0f172a;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+    .container{
+      max-width:1000px;margin:0 auto;
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:20px;
+      align-items:start;
+    }
+    header{
+      grid-column:1 / -1;
+      display:flex;align-items:center;gap:16px;margin-bottom:6px;
+    }
+    .logo{
+      width:54px;height:54px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--primary));
+      display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;box-shadow:var(--shadow);
+    }
+    h1{font-size:20px;margin:0}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+    .card{
+      background:var(--card);border-radius:12px;padding:18px;box-shadow:var(--shadow);
+    }
+    form .row{display:flex;gap:10px;margin-bottom:10px}
+    label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
+    input[type="text"], input[type="number"], select, textarea{
+      width:100%;padding:10px;border-radius:8px;border:1px solid #e6edf3;font-size:14px;
+      outline:none;
+    }
+    textarea{min-height:92px;resize:vertical}
+    .small{font-size:13px;color:var(--muted)}
+    button{
+      background:var(--primary);color:white;border:0;padding:10px 14px;border-radius:8px;font-weight:600;
+      cursor:pointer;
+    }
+    button.secondary{background:transparent;color:var(--primary);border:1px solid rgba(15,118,110,0.12)}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+    /* Right column (preview) */
+    .preview{position:relative}
+    .prescription{
+      display:flex;flex-direction:column;gap:8px;
+    }
+    .prescription h3{margin:0;font-size:16px}
+    .fitt{
+      display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px;
+    }
+    .pill{background:#f1f6f5;padding:10px;border-radius:8px;font-weight:600}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+    .meta .m{background:#fbfbfe;padding:8px;border-radius:8px;border:1px dashed #eef2f7;font-size:13px}
+    .notes{white-space:pre-wrap;background:#f8fafc;padding:10px;border-radius:8px;border-left:4px solid var(--accent)}
+    footer.appfoot{grid-column:1/-1;margin-top:14px;text-align:center;color:var(--muted);font-size:13px}
+    /* Responsive */
+    @media (max-width:980px){
+      .container{grid-template-columns:1fr; padding:12px}
+      .preview{order:2}
+      header{gap:12px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main">
+    <header>
+      <div class="logo">Rx</div>
+      <div>
+        <h1>Peresepan Olahraga</h1>
+        <p class="lead">Sistem sederhana untuk membuat peresepan olahraga berbasis FITT (Frequency, Intensity, Time, Type).</p>
+      </div>
+    </header>
+
+    <!-- Form kiri -->
+    <section class="card" aria-label="Form Peresepan">
+      <form id="prescForm" onsubmit="return false;" autocomplete="off">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+          <strong>Data Pasien</strong>
+          <span class="small">Isi data untuk personalisasi peresepan</span>
+        </div>
+
+        <div class="row">
+          <div style="flex:1">
+            <label for="name">Nama</label>
+            <input id="name" type="text" placeholder="Nama pasien / klien" required>
+          </div>
+          <div style="width:120px">
+            <label for="age">Usia</label>
+            <input id="age" type="number" min="5" max="120" value="30" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div style="flex:1">
+            <label for="weight">Berat (kg)</label>
+            <input id="weight" type="number" min="20" max="300" value="70">
+          </div>
+          <div style="width:170px">
+            <label for="activity">Level aktivitas</label>
+            <select id="activity">
+              <option value="sedentary">Sedentary (minim)</option>
+              <option value="light">Ringan (1-2x/mgg)</option>
+              <option value="moderate" selected>Moderate (3-4x/mgg)</option>
+              <option value="vigorous">Vigorous (>=5x/mgg)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px">
+          <label for="meds">Kondisi medis / pembatas</label>
+          <input id="meds" type="text" placeholder="contoh: hipertensi, nyeri lutut, diabetes">
+        </div>
+
+        <div style="margin-bottom:12px">
+          <label for="goal">Tujuan utama</label>
+          <select id="goal">
+            <option value="kesehatan">Meningkatkan kesehatan umum</option>
+            <option value="menurunkan_berat">Menurunkan berat badan</option>
+            <option value="kebugaran_kardiovaskular">Meningkatkan kebugaran kardiovaskular</option>
+            <option value="kekuatan">Meningkatkan kekuatan</option>
+            <option value="rehab">Rehabilitasi (pemulihan)</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom:12px">
+          <label for="notes">Catatan klinis / instruksi tambahan</label>
+          <textarea id="notes" placeholder="Instruksi khusus yang harus disertakan di peresepan..."></textarea>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:6px">
+          <div class="controls">
+            <button id="generateBtn" type="button">Buat Peresepan</button>
+            <button id="saveBtn" class="secondary" type="button">Simpan Lokal</button>
+            <button id="exportBtn" class="secondary" type="button">Export JSON</button>
+            <button id="clearBtn" class="secondary" type="button">Kosongkan</button>
+          </div>
+          <div class="small">Versi: 1.0 • Dicetak: <span id="dateNow"></span></div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Preview kanan -->
+    <aside class="card preview" aria-label="Pratinjau Peresepan">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <strong>Pratinjau Peresepan</strong>
+        <div style="display:flex;gap:8px">
+          <button id="printBtn" class="secondary">Cetak</button>
+        </div>
+      </div>
+
+      <div id="output" class="prescription" aria-live="polite">
+        <div class="small" style="color:var(--muted)">Belum ada peresepan — isi formulir lalu klik "Buat Peresepan".</div>
+      </div>
+    </aside>
+
+    <footer class="appfoot card">
+      Dibuat untuk keperluan klinik/pembelajaran — silakan sesuaikan dengan pedoman lokal & kemampuan pasien.
+    </footer>
+  </div>
+
+  <script>
+    // util
+    const $ = id => document.getElementById(id);
+    const now = new Date();
+    $('dateNow').textContent = now.toLocaleDateString('id-ID', {year:'numeric',month:'short',day:'numeric'});
+
+    function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
+    // intensity suggestion helper (RPE and HR%)
+    function intensitySuggestion(goal, activityLevel, age){
+      // basic logic: returns object with descriptors
+      const ageNum = Number(age) || 30;
+      const hrMax = 220 - ageNum;
+      let intensity = {label:'Moderate', rpe:'12-14', hrPercent:'64-76%', hrRange:`${Math.round(hrMax*0.64)}-${Math.round(hrMax*0.76)} bpm`};
+
+      if(goal === 'menurunkan_berat') {
+        intensity.label = 'Moderate to Vigorous';
+        intensity.rpe = '13-16';
+        intensity.hrPercent = '64-85%';
+        intensity.hrRange = `${Math.round(hrMax*0.64)}-${Math.round(hrMax*0.85)} bpm`;
+      } else if(goal === 'kekuatan'){
+        intensity.label = 'Resistance: Moderate-High';
+        intensity.rpe = '12-17 (beban)'; 
+        intensity.hrPercent = 'N/A';
+        intensity.hrRange = 'N/A';
+      } else if(goal === 'rehab'){
+        intensity.label = 'Low to Moderate';
+        intensity.rpe = '9-12';
+        intensity.hrPercent = '50-64%';
+        intensity.hrRange = `${Math.round(hrMax*0.50)}-${Math.round(hrMax*0.64)} bpm`;
+      } else if(goal === 'kebugaran_kardiovaskular'){
+        intensity.label = 'Moderate to Vigorous';
+        intensity.rpe = '12-16';
+        intensity.hrPercent = '64-85%';
+        intensity.hrRange = `${Math.round(hrMax*0.64)}-${Math.round(hrMax*0.85)} bpm`;
+      } else {
+        // kesehatan umum
+        intensity.label = 'Light to Moderate';
+        intensity.rpe = '11-13';
+        intensity.hrPercent = '50-70%';
+        intensity.hrRange = `${Math.round(hrMax*0.50)}-${Math.round(hrMax*0.70)} bpm`;
+      }
+
+      // adjust if activity level already vigorous -> nudge up
+      if(activityLevel === 'vigorous'){
+        intensity.rpe = intensity.rpe.replace(/\d+/g, m => Math.min(19, Number(m)+1));
+      }
+      return intensity;
+    }
+
+    // progression suggestion
+    function progressionSuggestion(goal){
+      if(goal === 'rehab') return 'Mulai dengan 2-3 sesi ringan/minggu; tingkatkan durasi 10% per minggu jika toleransi baik.';
+      if(goal === 'kekuatan') return 'Mulai 2 sesi/minggu per grup otot, progresi beban 2-10% tiap 1-2 minggu.';
+      if(goal === 'menurunkan_berat') return 'Tingkatkan frekuensi/durasi secara bertahap; target 150–300 menit/aerobik moderat per minggu.';
+      if(goal === 'kebugaran_kardiovaskular') return 'Tambah intensitas atau interval 1x/minggu; jaga minimal 3 sesi/minggu.';
+      return 'Mulai dengan 3 sesi/minggu, tingkatkan durasi 5–10% per minggu sesuai toleransi.';
+    }
+
+    function recommendType(goal, meds){
+      const lower = (meds||'').toLowerCase();
+      const list = [];
+      if(goal === 'kekuatan'){
+        list.push('Latihan kekuatan (multi-joint) 2-3x/minggu: squat variation, row, push, deadlift ringan, core.');
+        list.push('Tambahkan latihan fungsional dan mobilitas 1-2x/minggu.');
+      } else if(goal === 'rehab'){
+        list.push('Latihan mobilitas, neuromuscular re-education, latihan isometrik di awal.');
+        if(lower.includes('lutut') || lower.includes('knee')) list.push('Hingga 3x/minggu: strengthening quadriceps & gluteal ringan.');
+      } else {
+        list.push('Aerobik moderat: jalan cepat, bersepeda, elliptical 3-5x/minggu.');
+        if(goal === 'menurunkan_berat') list.push('Tambahkan 2 sesi latihan kekuatan mingguan.');
+        if(goal === 'kebugaran_kardiovaskular') list.push('Sertakan interval intensitas (HIIT) 1x/minggu jika aman.');
+      }
+      // if meds mention hypertension/diabetes, add note
+      if(lower.includes('hipertensi') || lower.includes('hypertension')){
+        list.push('Pantau tekanan darah; hindari valsalva saat latihan kekuatan.');
+      }
+      if(lower.includes('diabetes')){
+        list.push('Perhatikan gula darah sebelum & setelah latihan; bawa camilan cepat serat/gula.');
+      }
+      return list;
+    }
+
+    // build prescription
+    function buildPrescription(data){
+      const intensity = intensitySuggestion(data.goal, data.activity, data.age);
+      const typeList = recommendType(data.goal, data.meds);
+      const frequencyDefault = (data.goal === 'kekuatan' || data.goal === 'rehab') ? '2-3 kali/minggu' : '3-5 kali/minggu';
+      const timeDefault = (data.goal === 'kekuatan') ? '20-45 menit/sesi' : (data.goal === 'menurunkan_berat' ? '30-60 menit/sesi' : '20-40 menit/sesi');
+
+      const rx = {
+        patient: data.name,
+        date: new Date().toLocaleDateString('id-ID'),
+        age: data.age,
+        weight: data.weight || '',
+        goal: data.goal,
+        meds: data.meds || '',
+        FITT: {
+          Frequency: frequencyDefault,
+          Intensity: `${intensity.label} (RPE ${intensity.rpe}; HR ${intensity.hrPercent})`,
+          Time: timeDefault,
+          Type: typeList.join(' • ')
+        },
+        intensity_detail: intensity,
+        progression: progressionSuggestion(data.goal),
+        notes: data.notes || '',
+        recommendations: typeList
+      };
+      return rx;
+    }
+
+    function renderPrescription(rx){
+      const out = document.createElement('div');
+      out.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:10px">
+          <div>
+            <h3>Peresepan: ${escapeHtml(rx.patient)}</h3>
+            <div class="small" style="color:var(--muted)">${rx.date} • Usia: ${rx.age} tahun ${rx.weight? '• Berat: '+rx.weight+' kg':''}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="small">Tujuan: <strong>${formatGoal(rx.goal)}</strong></div>
+          </div>
+        </div>
+
+        <div class="fitt" style="margin-top:12px">
+          <div class="pill">Frequency<br><span style="font-weight:600">${escapeHtml(rx.FITT.Frequency)}</span></div>
+          <div class="pill">Intensity<br><span style="font-weight:600">${escapeHtml(rx.FITT.Intensity)}</span></div>
+          <div class="pill">Time<br><span style="font-weight:600">${escapeHtml(rx.FITT.Time)}</span></div>
+          <div class="pill">Type<br><span style="font-weight:600">${escapeHtml(truncate(rx.FITT.Type,120))}</span></div>
+        </div>
+
+        <div class="meta" style="margin-top:10px">
+          <div class="m">HR target: <strong>${escapeHtml(rx.intensity_detail.hrRange || rx.intensity_detail.hrPercent)}</strong></div>
+          <div class="m">RPE: <strong>${escapeHtml(rx.intensity_detail.rpe)}</strong></div>
+          <div class="m">Progresi: <strong>${escapeHtml(rx.progression)}</strong></div>
+        </div>
+
+        <div style="margin-top:10px">
+          <div style="font-weight:600;margin-bottom:6px">Rekomendasi latihan</div>
+          <div class="notes">${escapeHtml(rx.recommendations.join('\n'))}</div>
+        </div>
+
+        <div style="margin-top:10px">
+          <div style="font-weight:600;margin-bottom:6px">Catatan klinis</div>
+          <div class="notes">${escapeHtml(rx.notes || '—')}</div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+          <button id="editBtn" class="secondary" type="button">Edit Form</button>
+        </div>
+      `;
+      return out;
+    }
+
+    // helpers
+    function escapeHtml(s){
+      if(!s && s!==0) return '';
+      return String(s)
+        .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+        .replaceAll('"','&quot;').replaceAll("'","&#039;");
+    }
+    function truncate(s,n){
+      if(!s) return '';
+      return (s.length>n)? s.slice(0,n-1)+'…': s;
+    }
+    function formatGoal(g){
+      const map = {
+        kesehatan:'Meningkatkan kesehatan umum',
+        menurunkan_berat:'Menurunkan berat',
+        kebugaran_kardiovaskular:'Kebugaran kardiovaskular',
+        kekuatan:'Meningkatkan kekuatan',
+        rehab:'Rehabilitasi'
+      };
+      return map[g] || g;
+    }
+
+    // main actions
+    const generateBtn = $('generateBtn');
+    const saveBtn = $('saveBtn');
+    const exportBtn = $('exportBtn');
+    const clearBtn = $('clearBtn');
+    const printBtn = $('printBtn');
+    const outputEl = $('output');
+
+    function readForm(){
+      return {
+        name: $('name').value.trim() || 'Tanpa nama',
+        age: clamp(Number($('age').value)||30,5,120),
+        weight: $('weight').value ? Number($('weight').value) : '',
+        activity: $('activity').value,
+        meds: $('meds').value.trim(),
+        goal: $('goal').value,
+        notes: $('notes').value.trim()
+      };
+    }
+
+    generateBtn.addEventListener('click',()=>{
+      const data = readForm();
+      const rx = buildPrescription(data);
+      // save last to localStorage for quick reload
+      localStorage.setItem('lastPrescription', JSON.stringify(rx));
+      // render
+      outputEl.innerHTML = '';
+      outputEl.appendChild(renderPrescription(rx));
+      // bind edit button
+      const eb = document.getElementById('editBtn');
+      if(eb) eb.addEventListener('click', ()=> { window.scrollTo({top:0,behavior:'smooth'}); $('name').focus(); });
+    });
+
+    saveBtn.addEventListener('click', ()=>{
+      const data = readForm();
+      const rx = buildPrescription(data);
+      const key = 'rx_' + (new Date()).toISOString();
+      localStorage.setItem(key, JSON.stringify(rx));
+      alert('Peresepan disimpan secara lokal (key: '+key+').');
+    });
+
+    exportBtn.addEventListener('click', ()=>{
+      const data = readForm();
+      const rx = buildPrescription(data);
+      const blob = new Blob([JSON.stringify(rx,null,2)],{type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = (rx.patient || 'prescription') + '_rx.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    clearBtn.addEventListener('click', ()=>{
+      if(confirm('Kosongkan form?')) {
+        $('prescForm').reset();
+        outputEl.innerHTML = '<div class="small" style="color:var(--muted)">Belum ada peresepan — isi formulir lalu klik "Buat Peresepan".</div>';
+      }
+    });
+
+    printBtn.addEventListener('click', ()=>{
+      // simple print; hide buttons during print
+      const controls = document.querySelectorAll('button');
+      controls.forEach(b => b.style.display = 'none');
+      window.print();
+      setTimeout(()=> controls.forEach(b => b.style.display = ''), 800);
+    });
+
+    // load last saved if present
+    window.addEventListener('load', ()=>{
+      const last = localStorage.getItem('lastPrescription');
+      if(last){
+        try{
+          const rx = JSON.parse(last);
+          // prefill form a bit
+          if(rx && rx.patient) $('name').value = rx.patient;
+          if(rx && rx.age) $('age').value = rx.age;
+          if(rx && rx.weight) $('weight').value = rx.weight;
+          if(rx && rx.meds) $('meds').value = rx.meds;
+          if(rx && rx.notes) $('notes').value = rx.notes;
+          // render preview
+          outputEl.innerHTML = '';
+          outputEl.appendChild(renderPrescription(rx));
+        }catch(e){}
+      }
+    });
+
+    // accessibility: enter on form triggers generate
+    document.getElementById('prescForm').addEventListener('keydown', e => {
+      if(e.key === 'Enter' && (e.target.tagName !== 'TEXTAREA')) {
+        e.preventDefault();
+        generateBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>
